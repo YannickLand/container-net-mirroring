@@ -1,0 +1,78 @@
+# mirror – example configuration file
+#
+# Each entry under 'mirrorings' defines one traffic-forwarding rule that
+# mirrors packets from a host network interface into a Docker container.
+# The container receives a copy of matching packets without needing
+# network_mode: host.
+#
+# ── Fields ────────────────────────────────────────────────────────────────
+#
+# interface   Which host interface to mirror traffic from:
+#               "default"      – the interface used by the default IPv4 route
+#               "loopback"     – the loopback interface (lo)
+#               "all-physical" – every non-virtual interface on the host
+#               <name>         – a literal interface name, e.g. "eth0", "ens3"
+#
+# direction   Which traffic direction to capture:
+#               "ingress"  – packets arriving on the interface
+#               "egress"   – packets leaving the interface
+#               "both"     – ingress and egress
+#
+# container   The exact Docker container name (as shown in "docker ps").
+#
+# traffic     What to mirror. Either a preset name or a custom filter block:
+#
+#   Preset names (principle of least privilege – prefer the most specific):
+#     icmp   – ICMP only (ping, traceroute)
+#     dns    – DNS queries/responses (UDP + TCP :53)
+#     ntp    – NTP time-sync (UDP :123)
+#     web    – HTTP + HTTPS (TCP :80 + :443)
+#     ssh    – SSH sessions (TCP :22)
+#     all    – everything (⚠ over-privileged – a warning is emitted)
+#
+#   Custom filter block (all sub-fields except 'protocol' are optional):
+#     protocol: tcp | udp | icmp | all
+#     port:     <destination port number>    (tcp or udp only)
+#     src:      <IP address or CIDR>         (e.g. 10.0.0.0/8)
+#     dst:      <IP address or CIDR>
+#
+# ── Examples ──────────────────────────────────────────────────────────────
+
+mirrorings:
+
+  # Mirror only ICMP traffic arriving on the default route interface.
+  # Useful for a container that monitors ping/traceroute activity.
+  - interface: default
+    direction: ingress
+    container: net-observer
+    traffic: icmp
+
+  # Mirror DNS traffic (both UDP and TCP :53) in both directions.
+  # Useful for a container that analyses DNS behaviour.
+  - interface: default
+    direction: both
+    container: net-observer
+    traffic: dns
+
+  # Mirror HTTP + HTTPS egress traffic from the default interface.
+  - interface: default
+    direction: egress
+    container: net-observer
+    traffic: web
+
+  # Custom filter: mirror only TCP traffic on port 8080 from 10.0.0.0/8.
+  - interface: default
+    direction: ingress
+    container: net-observer
+    traffic:
+      protocol: tcp
+      port: 8080
+      src: 10.0.0.0/8
+
+  # Custom filter: mirror all UDP traffic destined for 192.168.1.1.
+  - interface: loopback
+    direction: ingress
+    container: net-observer
+    traffic:
+      protocol: udp
+      dst: 192.168.1.1

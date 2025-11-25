@@ -1,0 +1,47 @@
+# docker-compose.example.yml
+#
+# Demonstrates how to integrate the mirror setup container into a Docker
+# Compose deployment.
+#
+# The mirror container:
+#   - runs once after net-observer is up
+#   - requires NET_ADMIN + NET_RAW to configure tc rules
+#   - shares the host network namespace so it can address host interfaces
+#   - mounts /var/run for Docker socket access (veth resolution)
+#   - mounts /sys/class/net for interface introspection
+#
+# Replace the net-observer service with your actual workload container.
+
+services:
+
+  # ── Your observing container ────────────────────────────────────────────
+  net-observer:
+    container_name: net-observer
+    image: nicolaka/netshoot   # any image with tcpdump / tshark / etc.
+    command: ["tcpdump", "-i", "any", "-n"]
+    restart: unless-stopped
+
+  # ── Traffic mirroring setup ─────────────────────────────────────────────
+  mirror-setup:
+    container_name: mirror-setup
+    image: ghcr.io/yannickland/container-net-mirroring:latest
+    # Build locally instead:
+    # build: .
+    depends_on:
+      net-observer:
+        condition: service_started
+    # Host network is required so the mirror binary can address host interfaces
+    # and communicate with the Docker daemon socket.
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      # Docker socket – needed to resolve the container's veth index.
+      - /var/run:/var/run
+      # Interface metadata – needed for interface resolution.
+      - /sys/class/net:/sys/class/net:ro
+      # Mount your configuration file.
+      - ./config.yaml:/config.yaml:ro
+    # The container exits after applying the rules once.
+    restart: "no"
