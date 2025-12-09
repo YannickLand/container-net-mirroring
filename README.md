@@ -217,8 +217,14 @@ The **observer container** needs none of these.
 
 ## Building from source
 
+The tool targets Linux exclusively — it relies on the Linux Traffic Control
+subsystem (tc/netlink) and Linux procfs, which are not available on Windows or
+macOS. You can build from any OS using Go's cross-compilation support; the
+resulting binary must run on a Linux host (or inside a Linux container).
+
 ```bash
-go build -o mirror ./cmd/mirror
+# Cross-compile from any OS for Linux/amd64
+GOOS=linux GOARCH=amd64 go build -o mirror ./cmd/mirror
 ```
 
 Requires Go 1.22 or later. The resulting binary is statically linked and has
