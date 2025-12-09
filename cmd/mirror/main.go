@@ -1,3 +1,5 @@
+//go:build linux
+
 // mirror – configurable host-to-container traffic mirroring tool.
 //
 // Usage:
