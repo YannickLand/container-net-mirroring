@@ -1,3 +1,5 @@
+//go:build linux
+
 // Package docker resolves a container name to its veth interface name on the
 // host by querying the Docker daemon via the official Go SDK.
 package docker

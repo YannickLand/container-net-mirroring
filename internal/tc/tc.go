@@ -1,3 +1,5 @@
+//go:build linux
+
 // Package tc manages Linux Traffic Control (tc) qdiscs and filters via the
 // netlink API. It provides the primitives needed to set up and tear down
 // traffic mirroring from a host interface to a container veth.

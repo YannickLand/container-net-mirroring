@@ -1,3 +1,5 @@
+//go:build linux
+
 // Package iface resolves logical interface names ("default", "loopback",
 // "all-physical") to real kernel interface names using the netlink API.
 package iface
