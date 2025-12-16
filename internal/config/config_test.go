@@ -241,11 +241,11 @@ func TestFilterRulesFor_Preset(t *testing.T) {
 		wantWarn  bool
 	}{
 		{"icmp", 1, false},
-		{"dns", 2, false},  // UDP :53 + TCP :53
+		{"dns", 2, false}, // UDP :53 + TCP :53
 		{"ntp", 1, false},
-		{"web", 2, false},  // :80 + :443
+		{"web", 2, false}, // :80 + :443
 		{"ssh", 1, false},
-		{"all", 1, true},   // emits over-privilege warning
+		{"all", 1, true}, // emits over-privilege warning
 	}
 
 	for _, tc := range cases {
@@ -268,11 +268,11 @@ func TestFilterRulesFor_Preset(t *testing.T) {
 func TestFilterRulesFor_Custom(t *testing.T) {
 	port := 8080
 	cases := []struct {
-		name         string
-		filter       config.Filter
-		wantProto    string // FilterRule.Protocol field
-		wantIPProto  uint8
-		wantDstPort  uint16
+		name        string
+		filter      config.Filter
+		wantProto   string // FilterRule.Protocol field
+		wantIPProto uint8
+		wantDstPort uint16
 	}{
 		{
 			name:        "tcp",
