@@ -193,6 +193,19 @@ mirrorings:
       src: 10.0.0.0/8
 ```
 
+## Documentation
+
+| Type | Document |
+|---|---|
+| Tutorial | [Getting Started: your first traffic mirror](docs/tutorials/getting-started.md) |
+| How-to | [Configure a custom traffic filter](docs/how-to-guides/how-to-custom-filter.md) |
+| How-to | [Mirror multiple interfaces](docs/how-to-guides/how-to-multiple-interfaces.md) |
+| How-to | [Tear down mirroring rules](docs/how-to-guides/how-to-teardown.md) |
+| Explanation | [Architecture and design](docs/explanation/architecture.md) |
+| Explanation | [Security model](docs/explanation/security-model.md) |
+| Reference | [CLI reference](docs/reference/cli.md) |
+| Reference | [Configuration file reference](docs/reference/configuration.md) |
+
 ## CLI reference
 
 ```
@@ -229,6 +242,33 @@ GOOS=linux GOARCH=amd64 go build -o mirror ./cmd/mirror
 
 Requires Go 1.22 or later. The resulting binary is statically linked and has
 no runtime dependencies beyond a Linux kernel with tc support (≥ 3.18).
+
+## Development
+
+```bash
+# Run unit tests (platform-independent config package)
+go test ./internal/config/...
+
+# Run all tests (requires Linux)
+go test ./...
+
+# Lint
+golangci-lint run
+
+# Security scan — dependencies
+go install golang.org/x/vuln/cmd/govulncheck@latest
+govulncheck ./...
+
+# Build the binary (Linux target)
+GOOS=linux GOARCH=amd64 go build -o mirror ./cmd/mirror
+
+# Build the Docker image
+docker build -t mirror-setup .
+```
+
+Integration tests (iface, tc, docker packages) require a Linux host with
+`NET_ADMIN` and a running Docker daemon. See [tests/TODO.md](tests/TODO.md) for
+details.
 
 ## Security considerations
 
