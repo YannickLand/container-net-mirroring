@@ -3,7 +3,7 @@
 [![CI](https://github.com/YannickLand/container-net-mirroring/actions/workflows/ci.yml/badge.svg)](https://github.com/YannickLand/container-net-mirroring/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/YannickLand/container-net-mirroring/branch/main/graph/badge.svg)](https://codecov.io/gh/YannickLand/container-net-mirroring)
 [![Go 1.22](https://img.shields.io/badge/go-1.22-blue.svg)](https://golang.org/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18925417.svg)](https://doi.org/10.5281/zenodo.18925417)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Read-only network access for Docker containers via configurable traffic mirroring.**
