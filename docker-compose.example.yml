@@ -20,6 +20,17 @@ services:
     image: nicolaka/netshoot   # any image with tcpdump / tshark / etc.
     command: ["tcpdump", "-i", "any", "-n"]
     restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_RAW          # required for tcpdump / raw socket capture
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - observer-internal
 
   # ── Traffic mirroring setup ─────────────────────────────────────────────
   mirror-setup:
@@ -33,9 +44,17 @@ services:
     # Host network is required so the mirror binary can address host interfaces
     # and communicate with the Docker daemon socket.
     network_mode: host
+    cap_drop:
+      - ALL
     cap_add:
-      - NET_ADMIN
-      - NET_RAW
+      - NET_ADMIN        # required to configure tc qdiscs and filters
+      - NET_RAW          # required for packet-inspection hooks
+    security_opt:
+      - no-new-privileges:true
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp
     volumes:
       # Docker socket – needed to resolve the container's veth index.
       - /var/run:/var/run
@@ -45,3 +64,7 @@ services:
       - ./config.yaml:/config.yaml:ro
     # The container exits after applying the rules once.
     restart: "no"
+
+networks:
+  observer-internal:
+    internal: true
