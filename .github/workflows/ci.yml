@@ -7,13 +7,12 @@ on:
     branches: [main]
 
 jobs:
-  build-and-test:
-    name: Build, vet, and test
+  lint-and-test:
+    name: Lint, security scan, and test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -21,19 +20,24 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Verify dependencies
-        run: go mod verify
+      - name: Lint (golangci-lint)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+      - name: Security scan — dependencies (govulncheck)
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
 
       - name: Build (linux/amd64)
         run: GOOS=linux GOARCH=amd64 go build ./...
 
-      - name: Vet
-        run: GOOS=linux GOARCH=amd64 go vet ./...
+      - name: Run tests
+        run: go test ./... -v -coverprofile=coverage.out
 
-      - name: Test
-        # The config package has no Linux-kernel dependency and runs on any OS.
-        # Packages with //go:build linux are excluded automatically on
-        # ubuntu-latest when GOOS is not set differently, but they are still
-        # included since the runner IS linux — so we run tests explicitly only
-        # for the platform-independent packages.
-        run: go test -v -count=1 ./internal/config/...
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.out
+          fail_ci_if_error: false
